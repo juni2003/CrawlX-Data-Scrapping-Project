@@ -11,6 +11,7 @@ NEWSPIDER_MODULE = "scraper.spiders"
 ROBOTSTXT_OBEY = True
 
 ITEM_PIPELINES = {
+    "scraper.pipelines.SummarizerPipeline": 200,
     "scraper.pipelines.PostgresPipeline": 300,
 }
 
