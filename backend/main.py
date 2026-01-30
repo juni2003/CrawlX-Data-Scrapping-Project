@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Depends, Query
+from fastapi import FastAPI, Depends, Query, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from .db import SessionLocal, engine
 from .models import Base
 from . import crud, schemas
+from .scheduler import start_scheduler, stop_scheduler, run_spiders_async, DEFAULT_SPIDERS
 import io
 import csv
 
@@ -22,6 +22,12 @@ def get_db():
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
+    start_scheduler()
+
+
+@app.on_event("shutdown")
+def on_shutdown():
+    stop_scheduler()
 
 
 @app.get("/")
@@ -53,13 +59,11 @@ def search_items(
     return crud.search_items(db, q=q, skip=skip, limit=limit)
 
 
-
 @app.get("/items/export")
 def export_items_json(db: Session = Depends(get_db)):
     items = crud.get_items(db, skip=0, limit=1000)
     data = [schemas.ScrapedItemOut.model_validate(i).model_dump(mode="json") for i in items]
     return JSONResponse(content=data)
-
 
 
 @app.get("/items/export/csv")
@@ -81,3 +85,17 @@ def export_items_csv(db: Session = Depends(get_db)):
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=scraped_items.csv"}
     )
+
+
+@app.post("/scrape/run")
+async def run_scrape(spiders: str | None = None):
+    if spiders:
+        selected = [s.strip() for s in spiders.split(",") if s.strip()]
+    else:
+        selected = DEFAULT_SPIDERS
+
+    if not selected:
+        raise HTTPException(status_code=400, detail="No spiders specified")
+
+    await run_spiders_async(selected)
+    return {"status": "ok", "spiders": selected}
