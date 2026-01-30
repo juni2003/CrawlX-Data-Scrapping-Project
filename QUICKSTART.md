@@ -2,6 +2,10 @@
 
 This guide will help you quickly set up and test the new enhanced features.
 
+> **Windows Users:** See [WINDOWS_SETUP.md](WINDOWS_SETUP.md) for detailed Windows-specific instructions.
+> 
+> **Having Issues?** Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for solutions to common problems.
+
 ## Prerequisites
 
 - Python 3.8+
