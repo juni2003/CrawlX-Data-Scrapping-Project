@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select, or_, func
-from .models import ScrapedItem
+from models import ScrapedItem
 
 
 def get_items(db: Session, skip: int = 0, limit: int = 50, tag: str = None):

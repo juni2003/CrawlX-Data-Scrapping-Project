@@ -286,7 +286,7 @@ def generate_simple_table_pdf(items: List) -> BytesIO:
 ```python
 from sqlalchemy.orm import Session
 from sqlalchemy import select, or_, func
-from .models import ScrapedItem
+from models import ScrapedItem
 
 
 def get_items(db: Session, skip: int = 0, limit: int = 50, tag: str = None):
@@ -363,11 +363,12 @@ def search_items_fuzzy(db: Session, q: str, skip: int = 0, limit: int = 50, tag:
 from fastapi import FastAPI, Depends, Query, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.orm import Session
-from .db import SessionLocal, engine
-from .models import Base
-from . import crud, schemas
-from .scheduler import start_scheduler, stop_scheduler, run_spiders_async, DEFAULT_SPIDERS
-from .pdf_export import generate_items_pdf, generate_simple_table_pdf
+from db import SessionLocal, engine
+from models import Base
+import crud
+import schemas
+from scheduler import start_scheduler, stop_scheduler, run_spiders_async, DEFAULT_SPIDERS
+from pdf_export import generate_items_pdf, generate_simple_table_pdf
 import io
 import csv
 
