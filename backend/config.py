@@ -5,5 +5,5 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg2://postgres:juni071@localhost:5433/scraper_db"
+    "postgresql+psycopg2://postgres:juni071@localhost:5432/scraper_db"
 )

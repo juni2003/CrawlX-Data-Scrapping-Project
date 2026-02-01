@@ -27,7 +27,7 @@ class PostgresPipeline:
             user=os.getenv("PG_USER", "postgres"),
             password=os.getenv("PG_PASSWORD", "yourpassword"),
             host=os.getenv("PG_HOST", "localhost"),
-            port=os.getenv("PG_PORT", "5433"),
+            port=os.getenv("PG_PORT", "5432"),
         )
         self.cur = self.conn.cursor()
 
