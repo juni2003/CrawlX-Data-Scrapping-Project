@@ -13,6 +13,13 @@ export default function CustomScraperPage() {
   const [result, setResult] = useState<UrlScrapeResponse | null>(null);
   const [error, setError] = useState('');
 
+  const qualityLabel = (words?: number) => {
+    if (!words) return 'Unknown';
+    if (words >= 600) return 'High';
+    if (words >= 200) return 'Medium';
+    return 'Low';
+  };
+
   const handleScrape = async () => {
     if (!url) {
       setError('Please enter a URL');
@@ -45,14 +52,36 @@ export default function CustomScraperPage() {
     }
   };
 
+  const sanitizeFilename = (name: string) => {
+    return name
+      .replace(/[<>:"/\\|?*]/g, '')
+      .replace(/\s+/g, '-')
+      .slice(0, 80);
+  };
+
   const downloadAsText = () => {
     if (result?.content) {
-      const blob = new Blob([result.content], { type: 'text/plain' });
+      const documentText = [
+        `Title: ${result.title || 'N/A'}`,
+        `URL: ${result.url || 'N/A'}`,
+        `Author: ${result.author || 'N/A'}`,
+        `Published Date: ${result.published_date || 'N/A'}`,
+        `Extraction Method: ${result.extraction_method || 'N/A'}`,
+        `HTTP Status: ${result.http_status ?? 'N/A'}`,
+        `Word Count: ${result.word_count ?? 'N/A'}`,
+        `Extracted At: ${result.extracted_at || 'N/A'}`,
+        '',
+        '--- Extracted Content ---',
+        result.content,
+      ].join('\n');
+
+      const blob = new Blob([documentText], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${result.title || 'scraped-content'}.txt`;
+      a.download = `${sanitizeFilename(result.title || 'scraped-content')}.txt`;
       a.click();
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -66,6 +95,12 @@ export default function CustomScraperPage() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Extract content from any website with AI-powered intelligence
+          </p>
+        </div>
+
+        <div className="card p-4 mb-6 border-l-4 border-l-primary-500 bg-white/80 dark:bg-gray-900/60">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            Best results usually come from article/news/blog pages. For catalog-style pages, use Structured mode.
           </p>
         </div>
 
@@ -173,23 +208,43 @@ export default function CustomScraperPage() {
             </div>
 
             {/* Metadata */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
                 <span className="text-sm text-gray-500">Title:</span>
                 <p className="font-medium">{result.title || 'N/A'}</p>
               </div>
-              <div>
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
                 <span className="text-sm text-gray-500">Author:</span>
                 <p className="font-medium">{result.author || 'N/A'}</p>
               </div>
-              <div>
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
                 <span className="text-sm text-gray-500">Published:</span>
                 <p className="font-medium">{result.published_date || 'N/A'}</p>
               </div>
-              <div>
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
                 <span className="text-sm text-gray-500">Method:</span>
                 <p className="font-medium capitalize">{result.extraction_method}</p>
               </div>
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+                <span className="text-sm text-gray-500">Word Count:</span>
+                <p className="font-medium">{result.word_count ?? 'N/A'}</p>
+              </div>
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+                <span className="text-sm text-gray-500">HTTP Status:</span>
+                <p className="font-medium">{result.http_status ?? 'N/A'}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+                Quality: {qualityLabel(result.word_count)}
+              </span>
+              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                HTTP {result.http_status ?? 'N/A'}
+              </span>
+              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                {result.extraction_method || 'auto'} mode
+              </span>
             </div>
 
             {/* Description */}

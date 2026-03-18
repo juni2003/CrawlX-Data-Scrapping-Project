@@ -2,7 +2,6 @@
 Test script for custom URL scraper
 """
 import requests
-import json
 
 def test_custom_scraper():
     """Test the custom URL scraper endpoint"""
@@ -27,8 +26,9 @@ def test_custom_scraper():
             print(f"\n📊 Results:")
             print(f"   - Success: {data.get('success')}")
             print(f"   - URL: {data.get('url')}")
-            print(f"   - Title: {data.get('metadata', {}).get('title')}")
-            print(f"   - Word Count: {data.get('metadata', {}).get('word_count')}")
+            print(f"   - Title: {data.get('title')}")
+            print(f"   - Word Count: {data.get('word_count')}")
+            print(f"   - HTTP Status: {data.get('http_status')}")
             print(f"   - Content Length: {len(data.get('content', ''))}")
             print(f"   - Tables Found: {len(data.get('tables', []))}")
             print(f"   - Lists Found: {len(data.get('lists', []))}")

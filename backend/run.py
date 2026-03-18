@@ -6,6 +6,7 @@ before uvicorn starts, which is required for Playwright on Windows.
 """
 
 import asyncio
+import os
 import platform
 import sys
 
@@ -22,11 +23,15 @@ if __name__ == "__main__":
     print("Starting CrawlX Backend Server...")
     print(f"Platform: {platform.system()}")
     print(f"Python: {sys.version}")
+
+    host = os.getenv("HOST", "127.0.0.1")
+    port = int(os.getenv("PORT", "8000"))
+    reload_enabled = os.getenv("UVICORN_RELOAD", "false").lower() == "true"
     
     uvicorn.run(
         "main:app",
-        host="127.0.0.1",
-        port=8000,
-        reload=True,
+        host=host,
+        port=port,
+        reload=reload_enabled,
         log_level="info"
     )

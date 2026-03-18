@@ -56,6 +56,8 @@ class UrlScrapeResponse(BaseModel):
     tags: Optional[List[str]] = None
     tables: Optional[List[List[List[str]]]] = None
     lists: Optional[List[List[str]]] = None
+    word_count: Optional[int] = None
+    http_status: Optional[int] = None
     extracted_at: str
     extraction_method: Optional[str] = None
     error: Optional[str] = None
@@ -71,6 +73,8 @@ class UrlScrapeResponse(BaseModel):
                 "published_date": "2026-02-01",
                 "description": "Article description",
                 "tags": ["tech", "ai"],
+                "word_count": 784,
+                "http_status": 200,
                 "extracted_at": "2026-02-01T12:00:00",
                 "extraction_method": "article"
             }

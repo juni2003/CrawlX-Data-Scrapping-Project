@@ -2,13 +2,14 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from dotenv import load_dotenv
+from config import normalize_database_url
 
 load_dotenv()
 
-DATABASE_URL = os.getenv(
+DATABASE_URL = normalize_database_url(os.getenv(
     "DATABASE_URL",
     "postgresql+psycopg2://postgres:juni071@localhost:5432/scraper_db"
-)
+))
 
 # Configure connection pool to prevent hanging
 engine = create_engine(

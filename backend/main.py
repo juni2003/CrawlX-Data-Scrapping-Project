@@ -1,4 +1,5 @@
 import asyncio
+import os
 import platform
 import sys
 
@@ -26,10 +27,21 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Scraper Backend API")
 
+def _build_cors_origins() -> list[str]:
+    env_origins = os.getenv("CORS_ORIGINS", "")
+    parsed_env_origins = [o.strip() for o in env_origins.split(",") if o.strip()]
+
+    default_origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+
+    return list(dict.fromkeys(default_origins + parsed_env_origins))
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=_build_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,8 +74,7 @@ def on_startup():
 @app.on_event("shutdown")
 async def on_shutdown():
     """Cleanup on server shutdown."""
-    from scraper_engine.browser_pool import close_browser
-    
+
     try:
         stop_scheduler()
         logger.info("Scheduler stopped")
@@ -71,8 +82,11 @@ async def on_shutdown():
         logger.error(f"Scheduler shutdown error: {e}")
     
     try:
+        from scraper_engine.browser_pool import close_browser
         await close_browser()
         logger.info("Browser closed")
+    except ImportError:
+        logger.info("Browser cleanup skipped (Playwright unavailable in this environment)")
     except Exception as e:
         logger.error(f"Browser shutdown error: {e}")
 
@@ -241,7 +255,7 @@ async def scrape_custom_url(request: schemas.UrlScrapeRequest):
     {
         "url": "https://news.ycombinator.com",
         "extract_type": "auto",
-        "wait_seconds": 2
+        "wait_for": 2
     }
     ```
     
@@ -251,30 +265,41 @@ async def scrape_custom_url(request: schemas.UrlScrapeRequest):
     Returns:
         UrlScrapeResponse with extracted content
     """
-    from scraper_engine.simple_scraper import scrape_with_httpx
+    from scraper_engine.simple_scraper import ScrapeRequestError, scrape_with_httpx
     
     try:
         logger.info(f"Starting scrape for URL: {str(request.url)}")
         
         # Use simple httpx-based scraper (Windows compatible)
-        result = await scrape_with_httpx(str(request.url), request.wait_for)
+        result = await scrape_with_httpx(
+            str(request.url),
+            request.wait_for,
+            request.extract_type,
+        )
         
         # Build response according to schema
         from datetime import datetime
         
         return schemas.UrlScrapeResponse(
             success=True,
-            url=str(request.url),
+            url=result.get('final_url', str(request.url)),
             title=result.get('title'),
             content=result['content'],
             author=result.get('author'),
             published_date=result.get('published_date'),
+            description=result.get('description'),
+            tags=result.get('tags', []),
             tables=result.get('tables', []),
             lists=result.get('lists', []),
+            word_count=result.get('word_count', 0),
+            http_status=result.get('http_status'),
             extracted_at=datetime.now().isoformat(),
-            extraction_method=request.extract_type
+            extraction_method=result.get('extraction_method', request.extract_type)
         )
         
+    except ScrapeRequestError as e:
+        logger.warning(f"Scraping request failed: {e.detail}")
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     except HTTPException:
         raise
     except Exception as e:

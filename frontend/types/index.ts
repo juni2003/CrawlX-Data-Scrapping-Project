@@ -28,6 +28,8 @@ export interface UrlScrapeResponse {
   tags?: string[];
   tables?: string[][][];
   lists?: string[][];
+  word_count?: number;
+  http_status?: number;
   extracted_at: string;
   extraction_method?: string;
   error?: string;
