@@ -31,22 +31,9 @@ User Request → FastAPI Endpoint → httpx (HTTP client)
 ### Files Created/Modified
 
 #### ✅ Created: `backend/scraper_engine/simple_scraper.py`
-- **120 lines** of clean, Windows-compatible code
-- Uses **httpx** for HTTP requests (no browser)
-- Uses **trafilatura** for intelligent content extraction
-- Uses **BeautifulSoup4** for metadata and structured data
-- **Zero subprocess calls** = works perfectly on Windows
-
 #### ✅ Modified: `backend/main.py`
-- Updated `scrape_custom_url()` function (line 219-280)
-- Removed all Playwright dependencies
-- Fixed schema compatibility issues
-- Corrected parameter naming (`wait_seconds` → `wait_for`)
-
 #### ✅ Created: `test_custom_scraper.py`
-- Simple test script to verify functionality
-- Tests with https://books.toscrape.com
-- Shows detailed results
+
 
 ## Test Results
 
