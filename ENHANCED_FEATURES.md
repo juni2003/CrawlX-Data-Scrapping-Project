@@ -269,7 +269,6 @@ curl "http://localhost:8000/items/export/pdf?style=simple" -o items_table.pdf
 ```
 
 ---
-
 ## Development Notes
 
 ### Extending Summarization
