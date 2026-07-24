@@ -320,9 +320,7 @@ def parse_detail(self, response):
 - Scrapy - Web scraping framework
 - psycopg2-binary - PostgreSQL adapter
 - python-dotenv - Environment variables
-
 ---
-
 ## License
 
 This project is part of the CrawlX Data Scraping Project.
