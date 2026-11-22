@@ -55,7 +55,15 @@ def generate_summary_from_url(url: str, title: str = "") -> str:
     This is a fallback when full text is not available.
     
     Args:
-        url: The URL of the content
+        url: The URL
+        title: Optional title of the content
+    
+    Returns:
+        A simple summary string or empty if not available.
+    """
+    # As a fallback, return the title if provided, otherwise empty string
+    return title or ""
+of the content
         title: The title of the content
         
     Returns:
