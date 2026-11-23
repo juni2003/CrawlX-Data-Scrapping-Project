@@ -8,6 +8,7 @@ from sumy.summarizers.lsa import LsaSummarizer
 from sumy.nlp.stemmers import Stemmer
 from sumy.utils import get_stop_words
 import os
+import logging # Added this line
 
 # Download required NLTK data on first import
 try:
@@ -45,7 +46,7 @@ def summarize_text(text: str, sentences_count: int = SENTENCES_COUNT) -> str:
         return summary if summary else text
     except Exception as e:
         # If summarization fails, return original text
-        print(f"Summarization error: {e}")
+        logging.error(f"Summarization error: {e}")
         return text
 
 
