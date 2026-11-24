@@ -14,7 +14,14 @@ import logging # Added this line
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
-    nltk.download('punkt', quiet=True)
+    try:
+        print("NLTK 'punkt' tokenizer not found, attempting to download...")
+        nltk.download('punkt', quiet=True)
+        print("NLTK 'punkt' tokenizer downloaded successfully.")
+    except Exception as e:
+        print(f"ERROR: Failed to download NLTK 'punkt' tokenizer: {e}")
+        # Summarization functions will need to handle potential downstream errors
+        # if the tokenizer is truly missing.
 
 LANGUAGE = "english"
 SENTENCES_COUNT = 3  # Number of sentences in summary
