@@ -63,12 +63,14 @@ def generate_summary_from_url(url: str, title: str = "") -> str:
     This is a fallback when full text is not available.
     
     Args:
-        url: The URL of the content
-        title: The title of the content
+        url: The URL of the content.
+        title: The title of the content, if available.
         
     Returns:
-        A simple summary string
+        A basic summary string, prioritizing the title if provided,
+        otherwise a generic string including the URL.
     """
     if title:
-        return f"Article: {title}"
-    return f"Content from: {url}"
+        return title
+    # Fallback to a generic description if no title is provided
+    return f"Summary for {url}"
